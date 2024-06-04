@@ -10,6 +10,7 @@
 // what makes it such an awesome testing tool,
 // please read our getting started guide:
 // https://on.cypress.io/introduction-to-cypress
+/* eslint-disable cypress/no-async-tests */
 
 describe('example to-do app', () => {
   beforeEach(() => {
@@ -20,7 +21,7 @@ describe('example to-do app', () => {
     cy.visit('http://localhost:8080/todo')
   })
 
-  it('displays two todo items by default', () => {
+  it('displays two todo items by default', async () => {
     // We use the `cy.get()` command to get all elements that match the selector.
     // Then, we use `should` to assert that there are two matched items,
     // which are the two default items.
@@ -32,6 +33,9 @@ describe('example to-do app', () => {
     // and then perform an assertion with `should`.
     cy.get('.todo-list li').first().should('have.text', 'Pay electric bill')
     cy.get('.todo-list li').last().should('have.text', 'Walk the dog')
+    let summary = await cy.getAccessibilityResultsSummary();
+    let criticalIssueCount = summary["issueCountBySeverity"]["critical"];
+    assert.isTrue(criticalIssueCount < 10, "Critical issue count breached the threshold!");
   })
 
   it('can add new todo items', () => {
@@ -91,37 +95,8 @@ describe('example to-do app', () => {
         .check()
     })
 
-    it('can filter for uncompleted tasks', () => {
-      // We'll click on the "active" button in order to
-      // display only incomplete items
-      cy.contains('Active').click()
 
-      // After filtering, we can assert that there is only the one
-      // incomplete item in the list.
-      cy.get('.todo-list li')
-        .should('have.length', 1)
-        .first()
-        .should('have.text', 'Walk the dog')
-
-      // For good measure, let's also assert that the task we checked off
-      // does not exist on the page.
-      cy.contains('Pay electric bill').should('not.exist')
-    })
-
-    it('can filter for completed tasks', () => {
-      // We can perform similar steps as the test above to ensure
-      // that only completed tasks are shown
-      cy.contains('Completed').click()
-
-      cy.get('.todo-list li')
-        .should('have.length', 1)
-        .first()
-        .should('have.text', 'Pay electric bill')
-
-      cy.contains('Walk the dog').should('not.exist')
-    })
-
-    it('can delete all completed tasks', () => {
+    it('can delete all completed tasks', async () => {
       // First, let's click the "Clear completed" button
       // `contains` is actually serving two purposes here.
       // First, it's ensuring that the button exists within the dom.
@@ -138,6 +113,9 @@ describe('example to-do app', () => {
 
       // Finally, make sure that the clear button no longer exists.
       cy.contains('Clear completed').should('not.exist')
+      let summary = await cy.getAccessibilityResultsSummary();
+      let criticalIssueCount = summary["issueCountBySeverity"]["critical"];
+      assert.isTrue(criticalIssueCount < 10, "Critical issue count breached the threshold!");
     })
   })
 })

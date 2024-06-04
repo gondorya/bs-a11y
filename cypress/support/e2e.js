@@ -1,3 +1,4 @@
+require('browserstack-cypress-cli/bin/accessibility-automation/cypress');
 // ***********************************************************
 // This example support/e2e.js is processed and
 // loaded automatically before your test files.
